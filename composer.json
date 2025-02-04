@@ -1,0 +1,25 @@
+{
+    "name": "hengebytes/webservice-core-async-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony bundle for using http client as async",
+    "keywords": [
+        "API",
+        "ASYNC HTTP Client",
+        "Symfony",
+        "Bundle"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "symfony/dependency-injection": "^6.4 || ^7.0",
+        "symfony/http-client": "^6.4 || ^7.0"
+    },
+    "suggest": {
+        "hengebytes/response-filter-bundle": "For modify/filter responses"
+    },
+    "autoload": {
+        "psr-4": {
+            "WebserviceCoreAsyncBundle\\": "src/"
+        }
+    }
+}

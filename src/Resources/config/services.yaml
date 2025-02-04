@@ -1,0 +1,22 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    WebserviceCoreAsyncBundle\:
+        resource: '../../'
+        exclude:
+            - '../../Callback/'
+            - '../../Collection'
+            - '../../Cache'
+            - '../../DependencyInjection'
+            - '../../Enum'
+            - '../../Exception'
+            - '../../Logs'
+            - '../../Model'
+            - '../../Request'
+            - '../../Resources'
+            - '../../Response'
+            - '../../WebserviceCoreAsyncBundle.php'
+
+
