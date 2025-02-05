@@ -1,14 +1,15 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Middleware\Request;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Middleware\Request;
 
-use hengebytes\SettingBundle\Interfaces\SettingHandlerInterface;
-use WebserviceCoreAsyncBundle\Middleware\RequestModifierInterface;
-use WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Middleware\RequestModifierInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProviderInterface;
+use RuntimeException;
 
 readonly class BaseUrlRequestModifier implements RequestModifierInterface
 {
-    public function __construct(private SettingHandlerInterface $settingHandler)
+    public function __construct(private ?ParamsProviderInterface $paramsProvider = null)
     {
     }
 
@@ -17,15 +18,14 @@ readonly class BaseUrlRequestModifier implements RequestModifierInterface
         if ($request->isBaseUriSet()) {
             return;
         }
-        $uri = null;
-        if ($request->subService) {
-            $uri = $this->settingHandler->get($request->webService . '/' . $request->subService . '/base_url');
+        if (!$this->paramsProvider) {
+            throw new RuntimeException('Please set base URL in request or provide ParamsProvider in backend/config/packages/webservice_core_async.yaml');
         }
 
-        $uri ??= $this->settingHandler->get($request->webService . '/base_url');
+        $uri = $this->paramsProvider->getBaseURL($request);
 
         if ($uri === null) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'Base URL not found for ' . $request->webService
                 . ($request->subService ? '/' . $request->subService : '')
             );

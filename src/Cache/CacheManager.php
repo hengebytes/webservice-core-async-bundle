@@ -1,11 +1,11 @@
 <?php
 
 
-namespace WebserviceCoreAsyncBundle\Cache;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Cache;
 
-use WebserviceCoreAsyncBundle\Request\WSRequest;
-use WebserviceCoreAsyncBundle\Response\CacheResponse;
-use WebserviceCoreAsyncBundle\Tagger\CacheTagProvider;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\CacheResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Tagger\CacheTagProvider;
 use Exception;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;

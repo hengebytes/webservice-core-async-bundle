@@ -1,14 +1,14 @@
 <?php
 
 
-namespace WebserviceCoreAsyncBundle\Handler;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Handler;
 
-use WebserviceCoreAsyncBundle\Cache\CacheManager;
-use WebserviceCoreAsyncBundle\Exception\ConnectionInitException;
-use WebserviceCoreAsyncBundle\Middleware\RequestModification;
-use WebserviceCoreAsyncBundle\Middleware\ResponseModification;
-use WebserviceCoreAsyncBundle\Request\WSRequest;
-use WebserviceCoreAsyncBundle\Response\AsyncResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Cache\CacheManager;
+use Hengebytes\WebserviceCoreAsyncBundle\Exception\ConnectionInitException;
+use Hengebytes\WebserviceCoreAsyncBundle\Middleware\RequestModification;
+use Hengebytes\WebserviceCoreAsyncBundle\Middleware\ResponseModification;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\AsyncResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;

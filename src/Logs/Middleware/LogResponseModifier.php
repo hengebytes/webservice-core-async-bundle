@@ -1,12 +1,12 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Logs\Middleware;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Logs\Middleware;
 
-use WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
-use WebserviceCoreAsyncBundle\Logs\MonologLogHandler;
-use WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
-use WebserviceCoreAsyncBundle\Response\AsyncResponse;
-use WebserviceCoreAsyncBundle\Response\ParsedResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
+use Hengebytes\WebserviceCoreAsyncBundle\Logs\MonologLogHandler;
+use Hengebytes\WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\AsyncResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\ParsedResponse;
 
 readonly class LogResponseModifier implements ResponseModificationInterface
 {

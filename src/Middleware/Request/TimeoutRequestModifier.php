@@ -1,30 +1,24 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Middleware\Request;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Middleware\Request;
 
-use hengebytes\SettingBundle\Interfaces\SettingHandlerInterface;
-use WebserviceCoreAsyncBundle\Middleware\RequestModifierInterface;
-use WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Middleware\RequestModifierInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProviderInterface;
 
 readonly class TimeoutRequestModifier implements RequestModifierInterface
 {
-    public function __construct(private SettingHandlerInterface $settingHandler)
+    public function __construct(private ?ParamsProviderInterface $paramsProvider = null)
     {
     }
 
     public function modify(WSRequest $request): void
     {
-        if ($request->subService) {
-            $timeout = $this->settingHandler->get(
-                'timeout/' . $request->webService . '/' . $request->subService . '/' . $request->getCustomAction()
-            );
+        if (!$this->paramsProvider) {
+            return;
         }
 
-        $timeout ??= $this->settingHandler->get(
-            'timeout/' . $request->webService . '/' . $request->getCustomAction()
-        );
-
-        $timeout = (float)$timeout;
+        $timeout = $this->paramsProvider->getTimeout($request);
 
         if ($timeout > 0) {
             $request->setTimeout($timeout);

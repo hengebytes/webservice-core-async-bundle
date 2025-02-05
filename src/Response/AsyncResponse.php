@@ -1,11 +1,11 @@
 <?php
 
 
-namespace WebserviceCoreAsyncBundle\Response;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Response;
 
-use WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
-use WebserviceCoreAsyncBundle\Exception\ResponseFailException;
-use WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
+use Hengebytes\WebserviceCoreAsyncBundle\Exception\ResponseFailException;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;

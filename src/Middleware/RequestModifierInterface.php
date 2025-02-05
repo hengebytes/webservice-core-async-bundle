@@ -1,8 +1,8 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Middleware;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Middleware;
 
-use WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('webservice_core_async.middleware.request')]

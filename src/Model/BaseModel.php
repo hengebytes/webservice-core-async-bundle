@@ -1,6 +1,6 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Model;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Model;
 
 abstract class BaseModel
 {

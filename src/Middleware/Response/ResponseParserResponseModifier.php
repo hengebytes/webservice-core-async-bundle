@@ -1,12 +1,12 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Middleware\Response;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Middleware\Response;
 
-use WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
-use WebserviceCoreAsyncBundle\Exception\ResponseFailException;
-use WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
-use WebserviceCoreAsyncBundle\Response\AsyncResponse;
-use WebserviceCoreAsyncBundle\Response\ParsedResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
+use Hengebytes\WebserviceCoreAsyncBundle\Exception\ResponseFailException;
+use Hengebytes\WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\AsyncResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\ParsedResponse;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;

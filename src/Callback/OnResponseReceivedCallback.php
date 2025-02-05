@@ -1,8 +1,8 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Callback;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Callback;
 
-use WebserviceCoreAsyncBundle\Response\ParsedResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\ParsedResponse;
 
 readonly class OnResponseReceivedCallback
 {

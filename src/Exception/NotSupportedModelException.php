@@ -1,6 +1,6 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Exception;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Exception;
 
 use Exception;
 

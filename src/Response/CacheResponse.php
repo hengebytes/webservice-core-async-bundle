@@ -1,6 +1,6 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Response;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Response;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\ResponseInterface;

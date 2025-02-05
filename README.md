@@ -11,8 +11,13 @@ composer require hengebytes/webservice-core-async-bundle
 ## Configuration
 
 ```yaml
-# config/packages/webservice_core_async.yaml
-webservice_core_async:
+# config/packages/hb_webservice_core_async.yaml
+hb_webservice_core_async:
+    # Available options: 'symfony_params', 'settings_bundle', 'foo.bar.service_name'
+    # If 'symfony_params' is used, the bundle will look for the parameters in the symfony param bag
+    # If 'settings_bundle' is used, the bundle will look for the parameters in the hengebytes/settings-bundle
+    # If 'foo.bar.service_name' is used, the bundle will look for the parameters in the service 'foo.bar.service_name' should implement Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProviderInterface
+    params_provider: ~ # default is null
     # by default the bundle will not use any cache
     cache:
         # second level cache adapter for persistent data default is null
@@ -45,7 +50,7 @@ monolog:
 // config/bundles.php
 return [
     // ...
-    WebserviceCoreAsyncBundle\WebserviceCoreAsyncBundle::class => ['all' => true],
+    Hengebytes\WebserviceCoreAsyncBundle\HBWebserviceCoreAsyncBundle::class => ['all' => true],
 ];
 ```
 
@@ -57,9 +62,9 @@ return [
 // src/Service/MyService.php
 namespace App\Service;
 
-use WebserviceCoreAsyncBundle\Handler\AsyncRequestHandler;
-use WebserviceCoreAsyncBundle\Response\AsyncResponse;
-use WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Handler\AsyncRequestHandler;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\AsyncResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
 
 class MyService
 {
@@ -152,7 +157,7 @@ class MyController extends AbstractController
 }
 ```
 
-### Available Settings in hengebytes/settings-bundle
+### Possible variants of configuration params in Settings when using `settings_bundle`
 
 | Key                                                       | Value                 |
 |-----------------------------------------------------------|-----------------------|
@@ -161,6 +166,31 @@ class MyController extends AbstractController
 | `cache/my_service/customAction/ttl`                       | 600                   |
 | IF NO CUSTOM ACTION`cache/my_service/action/ttl`          | 600                   |
 | OVERRIDE`cache/my_service/my_subService/customAction/ttl` | 300                   |
+| `timeout/my_service/customAction`                         | 15                    |
+| OVERRIDE`timeout/my_service/my_subService/customAction`   | 25                    |
+| `logs/store`                                              | 1                     |
+| OVERRIDE`logs/store/customAction`                         | 0                     |
+| `logs/mask_sensitive_data`                                | 1                     |
+| `logs/mask_sensitive_member_pii`                          | 1                     |
+| `logs/max_length`                                         | 900000                |
+
+### Possible variants of configuration params in symfony configuration when using `symfony_params`
+
+```yaml
+parameters:
+    hb_webservice_core_async.base_url.my_service: 'http://example.com'
+    hb_webservice_core_async.base_url.my_service.my_subService: 'http://example2.com'
+    hb_webservice_core_async.cache_ttl.my_service.customAction: 600
+    hb_webservice_core_async.cache_ttl.my_service.action: 600
+    hb_webservice_core_async.cache_ttl.my_service.my_subService.customAction: 300
+    hb_webservice_core_async.timeout.my_service.customAction: 15
+    hb_webservice_core_async.timeout.my_service.my_subService.customAction: 25
+    hb_webservice_core_async.logs.store: 1
+    hb_webservice_core_async.logs.store.customAction: 0
+    hb_webservice_core_async.logs.mask_sensitive_data: 1
+    hb_webservice_core_async.logs.mask_sensitive_member_pii: 1
+    hb_webservice_core_async.logs.max_length: 900000
+```
 
 ### Validate Response
 
@@ -170,10 +200,10 @@ To be used in parsing response and validate it to throw exception if needed
 // src/Middleware/MyResponseValidatorResponseModifier.php
 namespace App\Middleware;
 
-use WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
-use WebserviceCoreAsyncBundle\Request\WSRequest;
-use WebserviceCoreAsyncBundle\Response\ParsedResponse;
-// MyServiceResponseFailException should extend WebserviceCoreAsyncBundle\Exception\ResponseFailException
+use Hengebytes\WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\ParsedResponse;
+// MyServiceResponseFailException should extend Hengebytes\WebserviceCoreAsyncBundle\Exception\ResponseFailException
 use App\Exceptions\MyServiceResponseFailException;
 
 class MyResponseValidatorResponseModifier implements ResponseModificationInterface
@@ -216,12 +246,12 @@ Higher priority will be executed first
 
 Higher priority will be executed first
 
-| Key                                    | Value | Condition                                                           | Could be disabled |
-|----------------------------------------|-------|---------------------------------------------------------------------|-------------------|
-| `LockResponseLoaderResponseModifier`   | 250   | $response->isCached                                                 | With Cache        |
-| `ReloadLockedResponseResponseModifier` | 240   | $response->isCached                                                 | With Cache        |
-| `ResponseParserResponseModifier`       | 220   | Always                                                              | -                 |
-| `LogResponseModifier`                  | 210   | !$response->isCached                                                | With Logs         |
-| `StoreToCacheResponseModifier`         | -200  | !$response->isCached                                                | With Cache        |
-| `RequestUnlockResponseModifier`        | -210  | !$response->isCached && $response->WSRequest->isCachable()          | With Cache        |
-| `InvalidateCacheResponseModifier`      | -220  | !$response->isCached && !$response->WSRequest->isGETRequestMethod() | With Cache        |
+| Key                                    | Value | Condition                                                             | Could be disabled |
+|----------------------------------------|-------|-----------------------------------------------------------------------|-------------------|
+| `LockResponseLoaderResponseModifier`   | 250   | `$response->isCached`                                                 | With Cache        |
+| `ReloadLockedResponseResponseModifier` | 240   | `$response->isCached`                                                 | With Cache        |
+| `ResponseParserResponseModifier`       | 220   | Always                                                                | -                 |
+| `LogResponseModifier`                  | 210   | `!$response->isCached`                                                | With Logs         |
+| `StoreToCacheResponseModifier`         | -200  | `!$response->isCached`                                                | With Cache        |
+| `RequestUnlockResponseModifier`        | -210  | `!$response->isCached && $response->WSRequest->isCachable()`          | With Cache        |
+| `InvalidateCacheResponseModifier`      | -220  | `!$response->isCached && !$response->WSRequest->isGETRequestMethod()` | With Cache        |

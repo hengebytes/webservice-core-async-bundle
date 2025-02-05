@@ -1,8 +1,8 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Request;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Request;
 
-use WebserviceCoreAsyncBundle\Enum\RequestMethodEnum;
+use Hengebytes\WebserviceCoreAsyncBundle\Enum\RequestMethodEnum;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WSRequest

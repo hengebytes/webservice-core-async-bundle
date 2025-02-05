@@ -1,6 +1,6 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Logs;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Logs;
 
 abstract class MaskLogHelper
 {

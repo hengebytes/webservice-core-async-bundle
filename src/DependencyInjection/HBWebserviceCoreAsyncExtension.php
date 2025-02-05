@@ -1,16 +1,21 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\DependencyInjection;
+namespace Hengebytes\WebserviceCoreAsyncBundle\DependencyInjection;
 
-use WebserviceCoreAsyncBundle\Cache\CacheManager;
-use WebserviceCoreAsyncBundle\Logs\MonologLogHandler;
+use Hengebytes\SettingBundle\HBSettingBundle;
+use Hengebytes\SettingBundle\Interfaces\SettingHandlerInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Cache\CacheManager;
+use Hengebytes\WebserviceCoreAsyncBundle\Logs\MonologLogHandler;
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProvider\SettingsBundleParamsProvider;
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProvider\SymfonyParamsBugParamsProvider;
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class WebserviceCoreAsyncExtension extends Extension
+class HBWebserviceCoreAsyncExtension extends Extension
 {
     /**
      * {@inheritdoc}
@@ -22,6 +27,8 @@ class WebserviceCoreAsyncExtension extends Extension
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+
+        $this->configureParamsProvider($container, $config);
 
         $this->configureCache($container, $config['cache']);
         $this->configureLogs($container, $config['logs']);
@@ -68,6 +75,39 @@ class WebserviceCoreAsyncExtension extends Extension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
+    }
+
+    private function configureParamsProvider(ContainerBuilder $container, array $config): void
+    {
+        if (!$config['params_provider']) {
+            return;
+        }
+        $service = null;
+        switch ($config['params_provider']) {
+            case 'symfony_params':
+                $definition = $container->register(SymfonyParamsBugParamsProvider::class);
+                $definition->setPublic(false);
+                $definition->setAutowired(true);
+                $definition->setAutoconfigured(true);
+                $service = SymfonyParamsBugParamsProvider::class;
+                break;
+            case 'settings_bundle':
+                if (!class_exists(HBSettingBundle::class)) {
+                    throw new \LogicException('Setting bundle is not installed. Try running "composer require hengebytes/setting-bundle".');
+                }
+                $definition = $container->register(SettingsBundleParamsProvider::class);
+                $definition->setPublic(false);
+                $definition->setAutowired(true);
+                $definition->setAutoconfigured(true);
+
+                $service = SettingsBundleParamsProvider::class;
+                break;
+            default:
+                $service = $config['params_provider'];
+        }
+
+        $container->setAlias(ParamsProviderInterface::class, $service);
+
     }
 
 }

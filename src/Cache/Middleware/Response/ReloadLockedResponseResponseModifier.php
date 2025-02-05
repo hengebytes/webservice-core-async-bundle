@@ -1,12 +1,12 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Cache\Middleware\Response;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Cache\Middleware\Response;
 
-use WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
-use WebserviceCoreAsyncBundle\Handler\AsyncRequestHandler;
-use WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
-use WebserviceCoreAsyncBundle\Response\AsyncResponse;
-use WebserviceCoreAsyncBundle\Response\ParsedResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
+use Hengebytes\WebserviceCoreAsyncBundle\Handler\AsyncRequestHandler;
+use Hengebytes\WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\AsyncResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\ParsedResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 readonly class ReloadLockedResponseResponseModifier implements ResponseModificationInterface

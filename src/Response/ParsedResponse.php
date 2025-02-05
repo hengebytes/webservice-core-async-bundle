@@ -1,8 +1,8 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Response;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Response;
 
-use WebserviceCoreAsyncBundle\Exception\ResponseFailException;
+use Hengebytes\WebserviceCoreAsyncBundle\Exception\ResponseFailException;
 
 class ParsedResponse
 {

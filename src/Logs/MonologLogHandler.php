@@ -1,9 +1,9 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Logs;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Logs;
 
-use hengebytes\SettingBundle\Interfaces\SettingHandlerInterface;
-use WebserviceCoreAsyncBundle\Response\ParsedResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProviderInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\ParsedResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -14,7 +14,7 @@ class MonologLogHandler
 
     public function __construct(
         protected LoggerInterface $logger,
-        protected SettingHandlerInterface $settingHandler,
+        protected ?ParamsProviderInterface $paramsProvider,
         protected RequestStack $requestStack
     ) {
     }
@@ -22,8 +22,10 @@ class MonologLogHandler
     public function writeLog(ParsedResponse $parsedResponse): void
     {
         if (
-            !$this->settingHandler->get('logs/store', '1')
-            || !$this->settingHandler->get('logs/store/' . $parsedResponse->mainAsyncResponse->WSRequest->getCustomAction(), '1')
+            !$this->paramsProvider->getLogParameterValue('store', '1')
+            || !$this->paramsProvider->getLogParameterValue(
+                'store/' . $parsedResponse->mainAsyncResponse->WSRequest->getCustomAction(), '1'
+            )
         ) {
             return;
         }
@@ -37,10 +39,10 @@ class MonologLogHandler
         $requestParams = $parsedResponse->mainAsyncResponse->WSRequest->getRequestParams();
 
         if ($this->maskSensitiveData === null) {
-            $this->maskSensitiveData = (bool)$this->settingHandler->get('logs/mask_sensitive_data');
+            $this->maskSensitiveData = (bool)$this->paramsProvider->getLogParameterValue('mask_sensitive_data');
         }
         if ($this->maskSensitiveMemberPII === null) {
-            $this->maskSensitiveMemberPII = (bool)$this->settingHandler->get('logs/mask_sensitive_member_pii');
+            $this->maskSensitiveMemberPII = (bool)$this->paramsProvider->getLogParameterValue('mask_sensitive_member_pii');
         }
         $requestString = json_encode($requestParams, JSON_THROW_ON_ERROR);
         $responseBody = $parsedResponse->responseBody;
@@ -48,7 +50,7 @@ class MonologLogHandler
             MaskLogHelper::maskSensitiveVar($requestString, $this->maskSensitiveMemberPII);
             MaskLogHelper::maskSensitiveVar($responseBody, true);
         }
-        $responseMaxLength = $this->settingHandler->get('logs/max_length', 900000);
+        $responseMaxLength = $this->paramsProvider->getLogParameterValue('max_length', 900000);
         if ($responseBody && strlen($responseBody) > $responseMaxLength) {
             $response = substr($responseBody, 0, $responseMaxLength);
             $responseBody = $response;

@@ -1,8 +1,8 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Provider;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Provider;
 
-use WebserviceCoreAsyncBundle\Exception\NotSupportedModelException;
+use Hengebytes\WebserviceCoreAsyncBundle\Exception\NotSupportedModelException;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 /**

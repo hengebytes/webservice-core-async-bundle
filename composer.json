@@ -15,11 +15,12 @@
         "symfony/http-client": "^6.4 || ^7.0"
     },
     "suggest": {
-        "hengebytes/response-filter-bundle": "For modify/filter responses"
+        "hengebytes/response-filter-bundle": "For modify/filter responses",
+        "hengebytes/setting-bundle": "For store bundle settings in DB"
     },
     "autoload": {
         "psr-4": {
-            "WebserviceCoreAsyncBundle\\": "src/"
+            "Hengebytes\\WebserviceCoreAsyncBundle\\": "src/"
         }
     }
 }

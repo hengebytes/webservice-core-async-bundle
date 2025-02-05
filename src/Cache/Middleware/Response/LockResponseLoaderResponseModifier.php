@@ -1,13 +1,13 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Cache\Middleware\Response;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Cache\Middleware\Response;
 
-use WebserviceCoreAsyncBundle\Cache\CacheManager;
-use WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
-use WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
-use WebserviceCoreAsyncBundle\Response\AsyncResponse;
-use WebserviceCoreAsyncBundle\Response\CacheResponse;
-use WebserviceCoreAsyncBundle\Response\ParsedResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Cache\CacheManager;
+use Hengebytes\WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
+use Hengebytes\WebserviceCoreAsyncBundle\Middleware\ResponseModificationInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\AsyncResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\CacheResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\ParsedResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 

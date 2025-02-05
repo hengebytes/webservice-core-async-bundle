@@ -1,6 +1,6 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Enum;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Enum;
 
 enum RequestMethodEnum: string
 {

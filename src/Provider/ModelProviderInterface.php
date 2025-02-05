@@ -1,6 +1,6 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Provider;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Provider;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 

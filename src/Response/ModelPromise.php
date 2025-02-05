@@ -1,10 +1,10 @@
 <?php
 
-namespace WebserviceCoreAsyncBundle\Response;
+namespace Hengebytes\WebserviceCoreAsyncBundle\Response;
 
-use WebserviceCoreAsyncBundle\Exception\NotSupportedModelException;
-use WebserviceCoreAsyncBundle\Provider\ModelProvider;
-use WebserviceCoreAsyncBundle\Exception\ResponseFailException;
+use Hengebytes\WebserviceCoreAsyncBundle\Exception\NotSupportedModelException;
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ModelProvider;
+use Hengebytes\WebserviceCoreAsyncBundle\Exception\ResponseFailException;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 
 /**

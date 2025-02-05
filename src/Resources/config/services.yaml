@@ -3,10 +3,10 @@ services:
         autowire: true
         autoconfigure: true
 
-    WebserviceCoreAsyncBundle\:
+    Hengebytes\WebserviceCoreAsyncBundle\:
         resource: '../../'
         exclude:
-            - '../../Callback/'
+            - '../../Callback'
             - '../../Collection'
             - '../../Cache'
             - '../../DependencyInjection'
@@ -14,9 +14,10 @@ services:
             - '../../Exception'
             - '../../Logs'
             - '../../Model'
+            - '../../Provider/ParamsProvider'
             - '../../Request'
             - '../../Resources'
             - '../../Response'
-            - '../../WebserviceCoreAsyncBundle.php'
+            - '../../HBWebserviceCoreAsyncBundle.php'
 
 
