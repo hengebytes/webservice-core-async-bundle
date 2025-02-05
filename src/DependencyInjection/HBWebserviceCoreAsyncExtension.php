@@ -3,7 +3,6 @@
 namespace Hengebytes\WebserviceCoreAsyncBundle\DependencyInjection;
 
 use Hengebytes\SettingBundle\HBSettingBundle;
-use Hengebytes\SettingBundle\Interfaces\SettingHandlerInterface;
 use Hengebytes\WebserviceCoreAsyncBundle\Cache\CacheManager;
 use Hengebytes\WebserviceCoreAsyncBundle\Logs\MonologLogHandler;
 use Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProvider\SettingsBundleParamsProvider;
@@ -82,7 +81,7 @@ class HBWebserviceCoreAsyncExtension extends Extension
         if (!$config['params_provider']) {
             return;
         }
-        $service = null;
+
         switch ($config['params_provider']) {
             case 'symfony_params':
                 $definition = $container->register(SymfonyParamsBugParamsProvider::class);
