@@ -23,8 +23,8 @@ readonly class AsyncRequestHandler
         protected HttpClientInterface $client,
         protected RequestModification $requestModification,
         protected ResponseModification $responseModification,
-        protected ?CacheManager $cacheManager = null,
         protected ModelProvider $modelProvider,
+        protected ?CacheManager $cacheManager = null,
     ) {
     }
 
