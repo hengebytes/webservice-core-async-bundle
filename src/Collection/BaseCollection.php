@@ -51,7 +51,7 @@ abstract class BaseCollection extends ArrayCollection implements JsonSerializabl
      * @return static
      * @throws RuntimeException
      */
-    public function getSorted(array $orderings, int $limit = null, int $offset = null)
+    public function getSorted(array $orderings, ?int $limit = null, ?int $offset = null)
     {
         $criteria = Criteria::create();
         if ($orderings) {
@@ -132,7 +132,7 @@ abstract class BaseCollection extends ArrayCollection implements JsonSerializabl
      * @param string|null $collectionKeyProperty Property to retrieve key for collection item
      * @return self
      */
-    public function merge(BaseCollection $collection, string $collectionKeyProperty = null): self
+    public function merge(BaseCollection $collection, ?string $collectionKeyProperty = null): self
     {
         foreach ($collection as $model) {
             if ($collectionKeyProperty !== null && $model->{$collectionKeyProperty} !== null) {
