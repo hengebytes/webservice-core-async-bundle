@@ -64,11 +64,11 @@ namespace App\Service;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Handler\AsyncRequestHandler;
 use Hengebytes\WebserviceCoreAsyncBundle\Response\AsyncResponse;
-use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;use Hengebytes\WebserviceCoreAsyncBundle\Response\ModelPromise;
 
 class MyService
 {
-    public function __construct(private readonly AsyncRequestHandler) {
+    public function __construct(private readonly AsyncRequestHandler $rh) {
     }
 
     // sync example
@@ -112,6 +112,30 @@ class MyService
 
         return $this->rh->request($request);
     }
+    
+    
+    /**
+    * async example with model
+    * @param array $data
+    * @return ModelPromise<SomeModel>
+    * @throws \Hengebytes\WebserviceCoreAsyncBundle\Exception\ConnectionInitException
+    */
+    public function executeAsyncModel(array $data): ModelPromise
+    {
+        $request = new WSRequest(
+                'my_service',
+                '/profile',
+                RequestMethodEnum::POST,
+                'sub_service',
+        );
+        $request->setAuthBasic('username', 'password');
+        $request->setHeaders([
+            'Content-Type' => 'application/json',
+        ]);
+        $request->setBody(json_encode($data));
+
+        return $this->rh->requestModel($request, SomeModel::class);
+    }
 }
 ```
 
@@ -153,6 +177,26 @@ class MyController extends AbstractController
         $response2 = $result->toArray();
         
         return $this->json(['result' => array_merge($response1, $response2)]);
+    }
+    
+    
+    public function asyncWithModels(Request $request): JsonResponse
+    {
+        $requestParams = $request->request->all();
+        $requestParams['page'] = 1;
+        $result1 = $this->myService->executeAsyncModel($requestParams);
+        
+        $requestParams['page'] = 2;
+        $result2 = $this->myService->executeAsyncModel($requestParams);
+        // do something else while the request is being processed
+        
+        $model1 = $result->getModel();
+        $model2 = $result->getModel();
+        
+        return $this->json([
+            'page1' => $model1, 
+            'page2' $model2
+        ]);
     }
 }
 ```
@@ -255,3 +299,30 @@ Higher priority will be executed first
 | `StoreToCacheResponseModifier`         | -200  | `!$response->isCached`                                                | With Cache        |
 | `RequestUnlockResponseModifier`        | -210  | `!$response->isCached && $response->WSRequest->isCachable()`          | With Cache        |
 | `InvalidateCacheResponseModifier`      | -220  | `!$response->isCached && !$response->WSRequest->isGETRequestMethod()` | With Cache        |
+
+### You should create model provider for the model promise
+
+it will be automatically registered based on interface implementation
+and will be automatically called when the promise is resolved
+
+```php
+// src/Provider/MyModelProvider.php
+namespace App\Provider;
+
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ModelProviderInterface;
+use App\Model\SomeModel;
+use App\Model\SomeOtherModel;
+
+class MyModelProvider implements ModelProviderInterface
+{
+    public function getModel(mixed $data, ModelProvider $modelProvider): object
+    {
+        $data = $data['data'] ?? [];
+        $someOtherModel = $modelProvider->getModel(SomeOtherModel::class, $data['someOtherModel'] ?? []);
+        $someModel = new SomeModel($data)
+        $someModel->setSomeOtherModel($someOtherModel);
+
+        return $someModel;
+    }
+}
+```

@@ -1,25 +1,30 @@
 <?php
 
-
 namespace Hengebytes\WebserviceCoreAsyncBundle\Handler;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Cache\CacheManager;
 use Hengebytes\WebserviceCoreAsyncBundle\Exception\ConnectionInitException;
 use Hengebytes\WebserviceCoreAsyncBundle\Middleware\RequestModification;
 use Hengebytes\WebserviceCoreAsyncBundle\Middleware\ResponseModification;
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ModelProvider;
 use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
 use Hengebytes\WebserviceCoreAsyncBundle\Response\AsyncResponse;
+use Hengebytes\WebserviceCoreAsyncBundle\Response\ModelPromise;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class AsyncRequestHandler
+/**
+ * @template T
+ */
+readonly class AsyncRequestHandler
 {
     public function __construct(
-        protected readonly HttpClientInterface $client,
+        protected HttpClientInterface $client,
         protected RequestModification $requestModification,
         protected ResponseModification $responseModification,
-        protected readonly ?CacheManager $cacheManager = null,
+        protected ?CacheManager $cacheManager = null,
+        protected ModelProvider $modelProvider,
     ) {
     }
 
@@ -57,6 +62,17 @@ class AsyncRequestHandler
             }
             throw new ConnectionInitException($e->getMessage(), $e->getCode());
         }
+    }
+
+    /**
+     * @param WSRequest $request
+     * @param class-string<T> $modelClass
+     * @return ModelPromise<T>
+     * @throws ConnectionInitException
+     */
+    public function requestModel(WSRequest $request, string $modelClass): ModelPromise
+    {
+        return new ModelPromise($this->request($request), $modelClass, $this->modelProvider);
     }
 
 }
