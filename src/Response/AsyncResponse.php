@@ -1,12 +1,11 @@
 <?php
 
-
 namespace Hengebytes\WebserviceCoreAsyncBundle\Response;
 
+use Exception;
 use Hengebytes\WebserviceCoreAsyncBundle\Callback\OnResponseReceivedCallback;
 use Hengebytes\WebserviceCoreAsyncBundle\Exception\ResponseFailException;
 use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
-use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -27,22 +26,15 @@ class AsyncResponse
 
     public function getStatusCode(): int
     {
-        if (!$this->parsedResponse) {
-            $this->parsedResponse = new ParsedResponse($this);
-        }
-
-        if ($this->callbacksExecuted) {
-            return $this->parsedResponse->statusCode;
-        }
         try {
-            foreach ($this->onResponseReceivedCallbacks as $callback) {
-                $callback($this->parsedResponse);
-            }
-            $this->callbacksExecuted = true;
+            $this->processCallbacks();
         } catch (Exception) {
-            return $this->WSResponse->getStatusCode();
-        } catch (TransportExceptionInterface $e) {
-            return Response::HTTP_SERVICE_UNAVAILABLE;
+            try {
+                // original status code: $this->WSResponse->getStatusCode();
+                return $this->WSResponse->getStatusCode();
+            } catch (TransportExceptionInterface) {
+                return Response::HTTP_SERVICE_UNAVAILABLE;
+            }
         }
 
         return $this->parsedResponse->statusCode;
@@ -53,16 +45,7 @@ class AsyncResponse
      */
     public function getHeaders(): array
     {
-        if (!$this->parsedResponse) {
-            $this->parsedResponse = new ParsedResponse($this);
-        }
-
-        if (!$this->callbacksExecuted) {
-            foreach ($this->onResponseReceivedCallbacks as $callback) {
-                $callback($this->parsedResponse);
-            }
-            $this->callbacksExecuted = true;
-        }
+        $this->processCallbacks();
 
         if ($this->parsedResponse->exception) {
             /** @throws ResponseFailException */
@@ -77,15 +60,7 @@ class AsyncResponse
      */
     public function toArray(): array
     {
-        if (!$this->parsedResponse) {
-            $this->parsedResponse = new ParsedResponse($this);
-        }
-        if (!$this->callbacksExecuted) {
-            foreach ($this->onResponseReceivedCallbacks as $callback) {
-                $callback($this->parsedResponse);
-            }
-            $this->callbacksExecuted = true;
-        }
+        $this->processCallbacks();
 
         if ($this->parsedResponse->exception) {
             /** @throws ResponseFailException */
@@ -98,5 +73,19 @@ class AsyncResponse
     public function addOnResponseReceivedCallback(OnResponseReceivedCallback $onResponseReceived): void
     {
         $this->onResponseReceivedCallbacks[] = $onResponseReceived;
+    }
+
+    protected function processCallbacks(): void
+    {
+        if (!$this->parsedResponse) {
+            $this->parsedResponse = new ParsedResponse($this);
+        }
+
+        if (!$this->callbacksExecuted) {
+            foreach ($this->onResponseReceivedCallbacks as $callback) {
+                $callback($this->parsedResponse);
+            }
+            $this->callbacksExecuted = true;
+        }
     }
 }

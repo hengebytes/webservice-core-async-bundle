@@ -1,12 +1,11 @@
 <?php
 
-
 namespace Hengebytes\WebserviceCoreAsyncBundle\Cache;
 
+use Exception;
 use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
 use Hengebytes\WebserviceCoreAsyncBundle\Response\CacheResponse;
 use Hengebytes\WebserviceCoreAsyncBundle\Tagger\CacheTagProvider;
-use Exception;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
@@ -163,7 +162,7 @@ class CacheManager
 
     public function invalidateCacheByWSRequest(WSRequest $request): void
     {
-        //$this->invalidateCacheById($this->buildCacheId($request));
+        $this->invalidateCacheById($this->buildCacheId($request));
 
         $tags = $this->cacheTagProvider->getInvalidateTags($request);
         if (!$tags) {

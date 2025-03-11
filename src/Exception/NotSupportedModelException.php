@@ -2,9 +2,9 @@
 
 namespace Hengebytes\WebserviceCoreAsyncBundle\Exception;
 
-use Exception;
+use RuntimeException;
 
-class NotSupportedModelException extends Exception
+class NotSupportedModelException extends RuntimeException
 {
     public function __construct($model)
     {

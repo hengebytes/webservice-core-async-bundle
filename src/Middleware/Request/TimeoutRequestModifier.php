@@ -3,8 +3,8 @@
 namespace Hengebytes\WebserviceCoreAsyncBundle\Middleware\Request;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Middleware\RequestModifierInterface;
-use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
 use Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProviderInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
 
 readonly class TimeoutRequestModifier implements RequestModifierInterface
 {

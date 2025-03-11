@@ -3,6 +3,7 @@
 namespace Hengebytes\WebserviceCoreAsyncBundle\Provider;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Exception\NotSupportedModelException;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 /**
@@ -19,9 +20,9 @@ readonly class ModelProvider
     /**
      * @param class-string<T> $className
      * @return T
-     * @throws NotSupportedModelException
+     * @throws NotSupportedModelException if no provider for $className
      */
-    public function getModel(string $className, mixed $data)
+    public function getModel(string $className, mixed $data, ?WSRequest $request = null): object
     {
         $supportedProvider = null;
         /** @var ModelProviderInterface $provider */
@@ -36,6 +37,6 @@ readonly class ModelProvider
             throw new NotSupportedModelException($className);
         }
 
-        return $supportedProvider->getModel($data, $this);
+        return $supportedProvider->getModel($data, $this, $request);
     }
 }

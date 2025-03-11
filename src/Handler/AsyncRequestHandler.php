@@ -35,7 +35,7 @@ readonly class AsyncRequestHandler
     {
         $this->requestModification->modifyRequest($request);
 
-        $isCachableRequest = $request->isCachable() && $this->cacheManager !== null;
+        $isCachableRequest = $this->cacheManager !== null && $request->isCachable();
         if ($isCachableRequest && !$request->isSkipReadCache()) {
             $cacheResponse = $this->cacheManager->getByWSRequest($request);
             if (in_array($cacheResponse->getStatusCode(), [Response::HTTP_OK, Response::HTTP_LOCKED], true)) {

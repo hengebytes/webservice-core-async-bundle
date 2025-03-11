@@ -9,4 +9,6 @@ enum RequestMethodEnum: string
     case PUT = 'PUT';
     case PATCH = 'PATCH';
     case DELETE = 'DELETE';
+    case OPTIONS = 'OPTIONS';
+    case HEAD = 'HEAD';
 }

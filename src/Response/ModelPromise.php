@@ -3,9 +3,8 @@
 namespace Hengebytes\WebserviceCoreAsyncBundle\Response;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Exception\NotSupportedModelException;
-use Hengebytes\WebserviceCoreAsyncBundle\Provider\ModelProvider;
 use Hengebytes\WebserviceCoreAsyncBundle\Exception\ResponseFailException;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Provider\ModelProvider;
 
 /**
  * @template T
@@ -23,8 +22,8 @@ class ModelPromise
      * @param ModelProvider $modelProvider
      */
     public function __construct(
-        readonly private AsyncResponse $response,
-        readonly private string $className,
+        private AsyncResponse $response,
+        private string $className,
         readonly private ModelProvider $modelProvider
     ) {
     }
@@ -39,7 +38,8 @@ class ModelPromise
         if (!$this->model) {
             $data = $this->response->toArray();
 
-            $this->model = $this->modelProvider->getModel($this->className, $data);
+            $this->model = $this->modelProvider->getModel($this->className, $data, $this->response->WSRequest);
+            unset($this->response, $this->className);
         }
 
         return $this->model;
