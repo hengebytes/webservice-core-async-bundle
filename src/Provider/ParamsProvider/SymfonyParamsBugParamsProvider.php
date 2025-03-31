@@ -16,7 +16,7 @@ readonly class SymfonyParamsBugParamsProvider implements ParamsProviderInterface
     {
         $baseParamName = 'cache_ttl.' . $request->webService;
 
-        return $this->getParameterValueForRequest($request, $baseParamName);
+        return $this->getParameterValueForRequest($request, $baseParamName, true);
     }
 
     public function getBaseURL(WSRequest $request): ?string
@@ -30,7 +30,7 @@ readonly class SymfonyParamsBugParamsProvider implements ParamsProviderInterface
     {
         $baseParamName = 'timeout.' . $request->webService;
 
-        $timeout = $this->getParameterValueForRequest($request, $baseParamName);
+        $timeout = $this->getParameterValueForRequest($request, $baseParamName, true);
 
         return $timeout ?: 0;
     }
@@ -45,18 +45,20 @@ readonly class SymfonyParamsBugParamsProvider implements ParamsProviderInterface
     }
 
     private function getParameterValueForRequest(
-        WSRequest $request, string $namePrefix
+        WSRequest $request, string $namePrefix, bool $actionBased = false
     ): array|bool|string|int|float|\UnitEnum|null {
         $baseName = 'hb_webservice_core_async.' . $namePrefix;
+        $postName = $actionBased ? '.' . $request->getCustomAction() : '';
+        $name = $baseName . $request->subService . $postName;
         if (
             $request->subService
-            && $this->parameterBag->has($baseName . $request->subService)
+            && $this->parameterBag->has($name)
         ) {
-            return $this->parameterBag->get($baseName . $request->subService);
+            return $this->parameterBag->get($name);
         }
 
-        if ($this->parameterBag->has($baseName)) {
-            return $this->parameterBag->get($baseName);
+        if ($this->parameterBag->has($baseName . $postName)) {
+            return $this->parameterBag->get($baseName . $postName);
         }
 
         return null;
