@@ -15,6 +15,8 @@ class WSRequest
      */
     private array $options = [];
 
+    private array $cacheVaryingParams = [];
+
     public function __construct(
         public readonly string $webService,
         public readonly string $action,
@@ -154,5 +156,22 @@ class WSRequest
         $this->options['timeout'] = $timeout;
 
         return $this;
+    }
+
+    public function setCacheVaryingParams(array $params): static
+    {
+        $this->cacheVaryingParams = $params;
+
+        return $this;
+    }
+
+    public function getCacheParams(): array
+    {
+        $requestParams = $this->getRequestParams();
+        $varyingParams = $this->cacheVaryingParams;
+        ksort($requestParams);
+        ksort($varyingParams);
+
+        return array_merge($requestParams, $varyingParams);
     }
 }

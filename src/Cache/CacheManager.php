@@ -175,9 +175,7 @@ class CacheManager
     private function buildCacheId(WSRequest $request): string
     {
         return $request->webService . '-' . $request->subService . '-' . $request->action
-            . md5(
-                serialize($request->getRequestParams())
-            );
+            . md5(serialize($request->getCacheParams()));
     }
 
     private function sanitizeArray(array $array): array
