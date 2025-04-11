@@ -31,7 +31,8 @@ abstract class BaseModel
 
     public function isModified(): bool
     {
-        return $this->objectStatusHash !== $this->getObjectStatusHash();
+        return !$this->isNew() && !$this->isDeleted()
+            && $this->objectStatusHash !== $this->getObjectStatusHash();
     }
 
     public function isNew(): bool
