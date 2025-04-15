@@ -37,6 +37,7 @@ readonly class SymfonyParamsBugParamsProvider implements ParamsProviderInterface
 
     public function getLogParameterValue(string $name, ?string $defaultValue = null): ?string
     {
+        str_replace('/', '.', $name);
         $paramName = 'hb_webservice_core_async.logs.' . $name;
 
         $val = $this->parameterBag->has($paramName) ? $this->parameterBag->get($paramName) : null;
@@ -49,7 +50,7 @@ readonly class SymfonyParamsBugParamsProvider implements ParamsProviderInterface
     ): array|bool|string|int|float|\UnitEnum|null {
         $baseName = 'hb_webservice_core_async.' . $namePrefix;
         $postName = $actionBased ? '.' . $request->getCustomAction() : '';
-        $name = $baseName . $request->subService . $postName;
+        $name = $baseName . '.' . $request->subService . $postName;
         if (
             $request->subService
             && $this->parameterBag->has($name)
