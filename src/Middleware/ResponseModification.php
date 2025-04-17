@@ -3,12 +3,12 @@
 namespace Hengebytes\WebserviceCoreAsyncBundle\Middleware;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Response\AsyncResponse;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class ResponseModification
 {
     public function __construct(
-        #[TaggedIterator('webservice_core_async.middleware.response', defaultPriorityMethod: 'getPriority')]
+        #[AutowireIterator('webservice_core_async.middleware.response', defaultPriorityMethod: 'getPriority')]
         private iterable $modifiers
     ) {
     }

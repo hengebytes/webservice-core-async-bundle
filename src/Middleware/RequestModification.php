@@ -3,12 +3,12 @@
 namespace Hengebytes\WebserviceCoreAsyncBundle\Middleware;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class RequestModification
 {
     public function __construct(
-        #[TaggedIterator('webservice_core_async.middleware.request', defaultPriorityMethod: 'getPriority')]
+        #[AutowireIterator('webservice_core_async.middleware.request', defaultPriorityMethod: 'getPriority')]
         private iterable $modifiers
     ) {
     }

@@ -4,7 +4,7 @@ namespace Hengebytes\WebserviceCoreAsyncBundle\Provider;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Exception\NotSupportedModelException;
 use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * @template T
@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 readonly class ModelProvider
 {
     public function __construct(
-        #[TaggedIterator('webservice_core_async.provider.model', defaultPriorityMethod: 'getPriority')]
+        #[AutowireIterator('webservice_core_async.provider.model', defaultPriorityMethod: 'getPriority')]
         private iterable $providers
     ) {
     }

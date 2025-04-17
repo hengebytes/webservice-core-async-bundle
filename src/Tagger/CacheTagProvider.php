@@ -3,12 +3,12 @@
 namespace Hengebytes\WebserviceCoreAsyncBundle\Tagger;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class CacheTagProvider
 {
     public function __construct(
-        #[TaggedIterator('webservice_core_async.cache.tagger')]
+        #[AutowireIterator('webservice_core_async.cache.tagger')]
         private iterable $taggers
     ) {
     }
