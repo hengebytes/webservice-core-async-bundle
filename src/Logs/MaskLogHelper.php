@@ -21,6 +21,7 @@ abstract class MaskLogHelper
             '#ardNumber="(\d+)([\d]{4})"#',
             '#token=\s?"[^"]*"#',
             '#token":\s?"[^"]*"#',
+            '#secret":\s?"[^"]*"#',
         ];
         if ($maskMemberPII) {
             $patterns = array_merge($patterns, [
@@ -46,6 +47,7 @@ abstract class MaskLogHelper
             'ardNumber="*${2}"',
             'token="*"',
             'token:"*"',
+            'secret":"*"',
         ];
         if ($maskMemberPII) {
             $replacements = array_merge($replacements, [
