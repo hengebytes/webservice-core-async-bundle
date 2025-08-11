@@ -21,22 +21,22 @@ class MonologLogHandler
 
     public function writeLog(ParsedResponse $parsedResponse): void
     {
+        $WSRequest = $parsedResponse->mainAsyncResponse->WSRequest;
+
         if (
             !$this->paramsProvider->getLogParameterValue('store', '1')
             || !$this->paramsProvider->getLogParameterValue(
-                'store/' . $parsedResponse->mainAsyncResponse->WSRequest->getCustomAction(), '1'
+                'store/' . $WSRequest->getCustomAction(), '1'
             )
         ) {
             return;
         }
 
         $currentRequest = $this->requestStack->getCurrentRequest();
-        $webservice = $parsedResponse->mainAsyncResponse->WSRequest->webService;
-        if ($parsedResponse->mainAsyncResponse->WSRequest->subService) {
-            $webservice .= '-' . $parsedResponse->mainAsyncResponse->WSRequest->subService;
+        $webservice = $WSRequest->webService;
+        if ($WSRequest->subService) {
+            $webservice .= '-' . $WSRequest->subService;
         }
-
-        $requestParams = $parsedResponse->mainAsyncResponse->WSRequest->getRequestParams();
 
         if ($this->maskSensitiveData === null) {
             $this->maskSensitiveData = (bool)$this->paramsProvider->getLogParameterValue('mask_sensitive_data');
@@ -44,7 +44,26 @@ class MonologLogHandler
         if ($this->maskSensitiveMemberPII === null) {
             $this->maskSensitiveMemberPII = (bool)$this->paramsProvider->getLogParameterValue('mask_sensitive_member_pii');
         }
-        $requestString = json_encode($requestParams, JSON_THROW_ON_ERROR);
+
+        $requestStringParts = [];
+        $requestOptions = $WSRequest->getOptions();
+        foreach (['query', 'json', 'body'] as $field) {
+            if (!empty($requestOptions[$field])) {
+                $value = $requestOptions[$field];
+                if ($field === 'body' && !empty($value['body'])) {
+                    $value = $value['body'];
+                }
+                try {
+                    $requestStringParts[] = is_string($value)
+                        ? $value
+                        : json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    $requestStringParts[] = $e->getMessage();
+                }
+            }
+        }
+        $requestString = implode("\n\n", $requestStringParts);
+
         $responseBody = $parsedResponse->responseBody;
         if ($this->maskSensitiveData) {
             MaskLogHelper::maskSensitiveVar($requestString, $this->maskSensitiveMemberPII);
@@ -58,13 +77,13 @@ class MonologLogHandler
 
         $logContext = [
             'service' => $webservice,
-            'action' => $parsedResponse->mainAsyncResponse->WSRequest->getCustomAction(),
+            'action' => $WSRequest->getCustomAction(),
             'clientip' => $currentRequest?->getClientIp(),
             'request' => $requestString,
             'response' => $responseBody,
             'error' => $parsedResponse->exception?->getMessage(),
             'duration' => $parsedResponse->mainAsyncResponse->WSResponse->getInfo('total_time'),
-            'uri' => $parsedResponse->mainAsyncResponse->WSRequest->action,
+            'uri' => $WSRequest->action,
         ];
 
         if ($logContext['error'] !== null) {
