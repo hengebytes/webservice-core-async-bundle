@@ -167,11 +167,37 @@ class WSRequest
 
     public function getCacheParams(): array
     {
-        $requestParams = $this->getRequestParams();
+        $query = $this->options['query'] ?? [];
+        $body = $this->options['body'] ?? [];
+        $json = $this->options['json'] ?? [];
+        ksort($query);
+        ksort($body);
+        ksort($json);
+
+        $requestParams = [$query, $body, $json];
         $varyingParams = $this->cacheVaryingParams;
-        ksort($requestParams);
         ksort($varyingParams);
 
         return array_merge($requestParams, $varyingParams);
+    }
+
+    public function getLogString(): string
+    {
+        $requestStringParts = [];
+        $requestOptions = $this->getOptions();
+        foreach (['query', 'json', 'body'] as $field) {
+            if (!empty($requestOptions[$field])) {
+                $value = $requestOptions[$field];
+                try {
+                    $requestStringParts[] = is_string($value)
+                        ? $value
+                        : json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    $requestStringParts[] = $e->getMessage();
+                }
+            }
+        }
+
+        return implode("\n\n", $requestStringParts);
     }
 }

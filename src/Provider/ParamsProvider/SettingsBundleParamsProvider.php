@@ -15,16 +15,16 @@ readonly class SettingsBundleParamsProvider implements ParamsProviderInterface
     public function getCacheTTL(WSRequest $request): ?int
     {
         if ($request->subService) {
-            $ttl = (int)$this->settingHandler->get(
-                'cache/' . $request->webService . '/' . $request->subService . '/' . $request->getCustomAction() . '/ttl', '0'
+            $ttl = $this->settingHandler->get(
+                'cache/' . $request->webService . '/' . $request->subService . '/' . $request->getCustomAction() . '/ttl'
             );
         }
 
-        $ttl ??= (int)$this->settingHandler->get(
-            'cache/' . $request->webService . '/' . $request->getCustomAction() . '/ttl', '0'
+        $ttl ??= $this->settingHandler->get(
+            'cache/' . $request->webService . '/' . $request->getCustomAction() . '/ttl'
         );
 
-        return $ttl;
+        return $ttl ? (int)$ttl : null;
     }
 
     public function getBaseURL(WSRequest $request): ?string
