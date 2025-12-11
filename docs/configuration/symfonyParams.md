@@ -23,5 +23,6 @@ parameters:
     hb_webservice_core_async.logs.store.customAction: 0
     hb_webservice_core_async.logs.mask_sensitive_data: 1
     hb_webservice_core_async.logs.mask_sensitive_member_pii: 1
+    hb_webservice_core_async.logs.log_response_headers: 1
     hb_webservice_core_async.logs.max_length: 900000
 ```

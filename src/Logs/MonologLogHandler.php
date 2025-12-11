@@ -45,34 +45,18 @@ class MonologLogHandler
             $this->maskSensitiveMemberPII = (bool)$this->paramsProvider->getLogParameterValue('mask_sensitive_member_pii');
         }
 
-        $requestStringParts = [];
-        $requestOptions = $WSRequest->getOptions();
-        foreach (['query', 'json', 'body'] as $field) {
-            if (!empty($requestOptions[$field])) {
-                $value = $requestOptions[$field];
-                if ($field === 'body' && !empty($value['body'])) {
-                    $value = $value['body'];
-                }
-                try {
-                    $requestStringParts[] = is_string($value)
-                        ? $value
-                        : json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    $requestStringParts[] = $e->getMessage();
-                }
-            }
-        }
-        $requestString = implode("\n\n", $requestStringParts);
-
-        $responseBody = $parsedResponse->responseBody;
+        $requestString = $WSRequest->getLogString();
+        $responseString = $parsedResponse->getLogString(
+            (bool)$this->paramsProvider->getLogParameterValue('log_response_headers')
+        );
         if ($this->maskSensitiveData) {
             MaskLogHelper::maskSensitiveVar($requestString, $this->maskSensitiveMemberPII);
-            MaskLogHelper::maskSensitiveVar($responseBody, true);
+            MaskLogHelper::maskSensitiveVar($responseString, true);
         }
         $responseMaxLength = $this->paramsProvider->getLogParameterValue('max_length', 900000);
-        if ($responseBody && strlen($responseBody) > $responseMaxLength) {
-            $response = substr($responseBody, 0, $responseMaxLength);
-            $responseBody = $response;
+        if ($responseString && strlen($responseString) > $responseMaxLength) {
+            $response = substr($responseString, 0, $responseMaxLength);
+            $responseString = $response;
         }
 
         $logContext = [
@@ -80,7 +64,7 @@ class MonologLogHandler
             'action' => $WSRequest->getCustomAction(),
             'clientip' => $currentRequest?->getClientIp(),
             'request' => $requestString,
-            'response' => $responseBody,
+            'response' => $responseString,
             'error' => $parsedResponse->exception?->getMessage(),
             'duration' => $parsedResponse->mainAsyncResponse->WSResponse->getInfo('total_time'),
             'uri' => $WSRequest->action,

@@ -11,17 +11,18 @@ hb_webservice_core_async:
 
 ### Possible variants of configuration params in Settings Bundle
 
-| Key                                                       | Value                 |
-|-----------------------------------------------------------|-----------------------|
-| `my_service/base_url`                                     | `http://example.com`  |
-| OVERRIDE`my_service/my_subService/base_url`               | `http://example2.com` |
-| `cache/my_service/customAction/ttl`                       | 600                   |
-| IF NO CUSTOM ACTION`cache/my_service/action/ttl`          | 600                   |
+| Key                                                      | Value                 |
+|----------------------------------------------------------|-----------------------|
+| `my_service/base_url`                                    | `http://example.com`  |
+| OVERRIDE`my_service/my_subService/base_url`              | `http://example2.com` |
+| `cache/my_service/customAction/ttl`                      | 600                   |
+| IF NO CUSTOM ACTION`cache/my_service/action/ttl`         | 600                   |
 | OVERRIDE`cache/my_service/my_subService/customAction/ttl` | 300                   |
-| `timeout/my_service/customAction`                         | 15                    |
-| OVERRIDE`timeout/my_service/my_subService/customAction`   | 25                    |
-| `logs/store`                                              | 1                     |
-| OVERRIDE`logs/store/customAction`                         | 0                     |
-| `logs/mask_sensitive_data`                                | 1                     |
-| `logs/mask_sensitive_member_pii`                          | 1                     |
-| `logs/max_length`                                         | 900000                |
+| `timeout/my_service/customAction`                        | 15                    |
+| OVERRIDE`timeout/my_service/my_subService/customAction`  | 25                    |
+| `logs/store`                                             | 1                     |
+| OVERRIDE`logs/store/customAction`                        | 0                     |
+| `logs/mask_sensitive_data`                               | 1                     |
+| `logs/mask_sensitive_member_pii`                         | 1                     |
+| `logs/log_response_headers`                              | 1                     |
+| `logs/max_length`                                        | 900000                |

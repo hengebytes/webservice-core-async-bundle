@@ -16,4 +16,21 @@ class ParsedResponse
     {
     }
 
+    public function getLogString(bool $withHeaders = false): string
+    {
+        $responseInfo = $this->statusCode;
+        if ($withHeaders && $this->headers) {
+            try {
+                $responseInfo .= " - "
+                    . json_encode(
+                        $this->headers,
+                        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+                    );
+            } catch (\JsonException $e) {
+                $responseInfo .= " - " . $e->getMessage();
+            }
+        }
+
+        return $responseInfo . "\n\n" . $this->responseBody;
+    }
 }
