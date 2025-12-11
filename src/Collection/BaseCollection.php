@@ -53,7 +53,7 @@ abstract class BaseCollection extends ArrayCollection implements JsonSerializabl
      */
     public function getSorted(array $orderings, ?int $limit = null, ?int $offset = null)
     {
-        $criteria = Criteria::create();
+        $criteria = Criteria::create(true);
         if ($orderings) {
             $criteria->orderBy($orderings);
         }
