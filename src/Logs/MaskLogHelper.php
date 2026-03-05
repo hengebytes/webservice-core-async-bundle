@@ -22,6 +22,11 @@ abstract class MaskLogHelper
             '#token=\s?"[^"]*"#',
             '#token":\s?"[^"]*"#',
             '#secret":\s?"[^"]*"#',
+            '#eriesCode":\s?"[^"]*"#',
+            '#eriesCode="[^"]*"#',
+            '#eriesCode>[^<]*</#',
+            '#eriesCode&gt;(.*?)&lt;/#',
+            '#"cvv":\s?"[^"]*"#',
         ];
         if ($maskMemberPII) {
             $patterns = array_merge($patterns, [
@@ -48,6 +53,11 @@ abstract class MaskLogHelper
             'token="*"',
             'token:"*"',
             'secret":"*"',
+            'eriesCode":"*"',
+            'eriesCode="*"',
+            'eriesCode>*</',
+            'eriesCode&gt;*&lt;/',
+            '"cvv":"*"',
         ];
         if ($maskMemberPII) {
             $replacements = array_merge($replacements, [
@@ -66,11 +76,18 @@ abstract class MaskLogHelper
         }
         if (is_array($val)) {
             foreach ($val as $innerK => $innerVal) {
-                if ($innerK === 'creditCard' && isset($innerVal['number'])) {
-                    $val[$innerK]['number'] = '*';
+                if ($innerK === 'creditCard') {
+                    if (isset($innerVal['number'])) {
+                        $val[$innerK]['number'] = '*';
+                    }
+                    if (isset($innerVal['cvv'])) {
+                        $val[$innerK]['cvv'] = '*';
+                    }
                 } elseif (
                     stripos($innerK, 'password') !== false
                     || stripos($innerK, 'cardnumber') !== false
+                    || stripos($innerK, 'cvv') !== false
+                    || stripos($innerK, 'seriescode') !== false
                     || (
                         $maskMemberPII && (
                             stripos($innerK, 'address') !== false
