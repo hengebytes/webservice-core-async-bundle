@@ -34,7 +34,8 @@ abstract class MaskLogHelper
                 '#irthDate="[^"]*"#',
                 '#"[^@"]+@[^@"]+"#',
                 '#>[^@<]+@[^@<]+<#',
-                '#(Birthdate|AddressLine|postalCode|PostalCode|CityName|cityName|CITY|ZIP_CODE|NameEmail|BIRTH_DATE|ADDRESS[1-9]?)(.*?)(>|&gt;).*?(<|&lt;)/#',
+                '#<(Birthdate|AddressLine|postalCode|PostalCode|CityName|cityName|CITY|ZIP_CODE|NameEmail|BIRTH_DATE|ADDRESS[1-9]?)([^>]*)>[^<]*</\1>#',
+                '#&lt;(Birthdate|AddressLine|postalCode|PostalCode|CityName|cityName|CITY|ZIP_CODE|NameEmail|BIRTH_DATE|ADDRESS[1-9]?)([^&]*)&gt;.*?&lt;/\1&gt;#',
                 '#(city|zipCode|zip|birthday|birthdate|address[1-9]?)":\s?"[^"]*"#',
             ]);
         }
@@ -64,7 +65,8 @@ abstract class MaskLogHelper
                 'irthDate="*"',
                 '"*@*"',
                 '>*@*<',
-                '${1}${2}${3}*${4}/',
+                '<${1}${2}>*</${1}>',
+                '&lt;${1}${2}&gt;*&lt;/${1}&gt;',
                 '${1}":"*"',
             ]);
         }
