@@ -72,18 +72,19 @@ class CacheManager
     public function storeWSResponseByWSRequest(WSRequest $request, array $content, array $headers): void
     {
         $cacheId = $this->buildCacheId($request);
-        $ttl = $request->getCacheTTL($content, $headers);
-        if (!$ttl || $ttl <= 0) {
+        try {
+            $ttl = $request->getCacheTTL($content, $headers);
+            if (!$ttl || $ttl <= 0) {
+                return;
+            }
+
+            $cacheTags = $this->cacheTagProvider->getStoreTags($request, $content);
+
+            $this->store($cacheId, ['content' => $content/*, 'headers' => $headers*/], $ttl, $cacheTags);
+        } finally {
+            // unlock waiting requests even if TTL callback or tagging failed, otherwise they wait for the lock TTL
             $this->unlock($cacheId);
-
-            return;
         }
-
-        $cacheTags = $this->cacheTagProvider->getStoreTags($request, $content);
-
-        $this->store($cacheId, ['content' => $content/*, 'headers' => $headers*/], $ttl, $cacheTags);
-
-        $this->unlock($cacheId); // response has stored - unlock requests
     }
 
     public function unlockWSRequest(WSRequest $request): void
@@ -256,11 +257,17 @@ class CacheManager
         $this->readFromCache = $readFromCache;
     }
 
-    public function awaitUnlock(string $cacheId): void
+    /**
+     * @return float seconds waited
+     */
+    public function awaitUnlock(string $cacheId): float
     {
+        $start = microtime(true);
         // wait to unlock (it is not the first request)
         while ($this->isLocked($cacheId)) {
             sleep(1);
         }
+
+        return microtime(true) - $start;
     }
 }

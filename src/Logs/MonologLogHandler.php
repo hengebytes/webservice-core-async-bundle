@@ -3,6 +3,7 @@
 namespace Hengebytes\WebserviceCoreAsyncBundle\Logs;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Provider\ParamsProviderInterface;
+use Hengebytes\WebserviceCoreAsyncBundle\Request\WSRequest;
 use Hengebytes\WebserviceCoreAsyncBundle\Response\ParsedResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -33,10 +34,6 @@ class MonologLogHandler
         }
 
         $currentRequest = $this->requestStack->getCurrentRequest();
-        $webservice = $WSRequest->webService;
-        if ($WSRequest->subService) {
-            $webservice .= '-' . $WSRequest->subService;
-        }
 
         if ($this->maskSensitiveData === null) {
             $this->maskSensitiveData = (bool)$this->paramsProvider->getLogParameterValue('mask_sensitive_data');
@@ -60,7 +57,7 @@ class MonologLogHandler
         }
 
         $logContext = [
-            'service' => $webservice,
+            'service' => $this->getServiceName($WSRequest),
             'action' => $WSRequest->getCustomAction(),
             'clientip' => $currentRequest?->getClientIp(),
             'request' => $requestString,
@@ -75,5 +72,37 @@ class MonologLogHandler
         } else {
             $this->logger->info('CL', $logContext);
         }
+    }
+
+    /**
+     * Waiting for a cache lock leaves no request log (the response is served from cache), log long waits instead.
+     */
+    public function writeLockWaitLog(WSRequest $WSRequest, float $waited): void
+    {
+        if (
+            !$this->paramsProvider->getLogParameterValue('store', '1')
+            || $waited < (float)$this->paramsProvider->getLogParameterValue('lock_wait_threshold', '5')
+        ) {
+            return;
+        }
+
+        $this->logger->warning('CL', [
+            'service' => $this->getServiceName($WSRequest),
+            'action' => $WSRequest->getCustomAction() . ':lock_wait',
+            'clientip' => $this->requestStack->getCurrentRequest()?->getClientIp(),
+            'error' => sprintf('Waited %.1fs for cache lock', $waited),
+            'duration' => $waited,
+            'uri' => $WSRequest->action,
+        ]);
+    }
+
+    private function getServiceName(WSRequest $WSRequest): string
+    {
+        $webservice = $WSRequest->webService;
+        if ($WSRequest->subService) {
+            $webservice .= '-' . $WSRequest->subService;
+        }
+
+        return $webservice;
     }
 }

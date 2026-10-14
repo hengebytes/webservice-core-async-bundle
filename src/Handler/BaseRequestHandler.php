@@ -56,11 +56,15 @@ abstract readonly class BaseRequestHandler
             $this->responseModification->modifyResponse($asyncResponse);
 
             return $asyncResponse;
-        } catch (TransportExceptionInterface $e) {
+        } catch (\Throwable $e) {
+            // any failure before the response exists would otherwise leave the lock for its whole TTL
             if ($isCachableRequest) {
                 $this->cacheManager->unlockWSRequest($request);
             }
-            throw new ConnectionInitException($e->getMessage(), $e->getCode());
+            if ($e instanceof TransportExceptionInterface) {
+                throw new ConnectionInitException($e->getMessage(), $e->getCode());
+            }
+            throw $e;
         }
     }
 

@@ -26,3 +26,4 @@ hb_webservice_core_async:
 | `logs/mask_sensitive_member_pii`                         | 1                     |
 | `logs/log_response_headers`                              | 1                     |
 | `logs/max_length`                                        | 900000                |
+| `logs/lock_wait_threshold` (seconds)                     | 5                     |
