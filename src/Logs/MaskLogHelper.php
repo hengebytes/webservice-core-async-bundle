@@ -4,6 +4,17 @@ namespace Hengebytes\WebserviceCoreAsyncBundle\Logs;
 
 abstract class MaskLogHelper
 {
+    /** HTTP headers carrying credentials (lower-case, as returned by HeaderBag::all()). */
+    private const array SECRET_HEADERS = [
+        'authorization',
+        'apiauthorization',
+        'proxy-authorization',
+        'cookie',
+        'set-cookie',
+        'x-api-key',
+        'ssws',
+    ];
+
     public static function maskSensitiveVar(&$val, bool $maskMemberPII): void
     {
         // 'assword' cover 'Password' & 'password'
@@ -52,7 +63,7 @@ abstract class MaskLogHelper
             '"number":"*"',
             'ardNumber="*${2}"',
             'token="*"',
-            'token:"*"',
+            'token":"*"',
             'secret":"*"',
             'eriesCode":"*"',
             'eriesCode="*"',
@@ -85,6 +96,8 @@ abstract class MaskLogHelper
                     if (isset($innerVal['cvv'])) {
                         $val[$innerK]['cvv'] = '*';
                     }
+                } elseif (is_string($innerK) && in_array(strtolower($innerK), self::SECRET_HEADERS, true)) {
+                    $val[$innerK] = '*';
                 } elseif (
                     stripos($innerK, 'password') !== false
                     || stripos($innerK, 'cardnumber') !== false
