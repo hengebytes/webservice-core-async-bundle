@@ -13,7 +13,30 @@ abstract class MaskLogHelper
         'set-cookie',
         'x-api-key',
         'ssws',
+        'php-auth-user',
+        'php-auth-pw',
+        'php-auth-digest',
     ];
+
+    /**
+     * Headers are logged JSON-encoded, where the string patterns of maskSensitiveVar() do not match them:
+     * mask the array before it is encoded.
+     */
+    public static function maskHeaders(array $headers): array
+    {
+        foreach ($headers as $name => $value) {
+            if (self::isSecretHeader($name)) {
+                $headers[$name] = '*';
+            }
+        }
+
+        return $headers;
+    }
+
+    private static function isSecretHeader(int|string $name): bool
+    {
+        return is_string($name) && in_array(strtolower($name), self::SECRET_HEADERS, true);
+    }
 
     public static function maskSensitiveVar(&$val, bool $maskMemberPII): void
     {
@@ -96,7 +119,7 @@ abstract class MaskLogHelper
                     if (isset($innerVal['cvv'])) {
                         $val[$innerK]['cvv'] = '*';
                     }
-                } elseif (is_string($innerK) && in_array(strtolower($innerK), self::SECRET_HEADERS, true)) {
+                } elseif (self::isSecretHeader($innerK)) {
                     $val[$innerK] = '*';
                 } elseif (
                     stripos($innerK, 'password') !== false

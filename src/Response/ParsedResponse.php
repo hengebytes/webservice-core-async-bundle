@@ -3,6 +3,7 @@
 namespace Hengebytes\WebserviceCoreAsyncBundle\Response;
 
 use Hengebytes\WebserviceCoreAsyncBundle\Exception\ResponseFailException;
+use Hengebytes\WebserviceCoreAsyncBundle\Logs\MaskLogHelper;
 
 class ParsedResponse
 {
@@ -16,14 +17,14 @@ class ParsedResponse
     {
     }
 
-    public function getLogString(bool $withHeaders = false): string
+    public function getLogString(bool $withHeaders = false, bool $maskHeaders = false): string
     {
         $responseInfo = $this->statusCode;
         if ($withHeaders && $this->headers) {
             try {
                 $responseInfo .= " - "
                     . json_encode(
-                        $this->headers,
+                        $maskHeaders ? MaskLogHelper::maskHeaders($this->headers) : $this->headers,
                         JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
                     );
             } catch (\JsonException $e) {

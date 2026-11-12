@@ -44,7 +44,8 @@ class MonologLogHandler
 
         $requestString = $WSRequest->getLogString();
         $responseString = $parsedResponse->getLogString(
-            (bool)$this->paramsProvider->getLogParameterValue('log_response_headers')
+            (bool)$this->paramsProvider->getLogParameterValue('log_response_headers'),
+            $this->maskSensitiveData
         );
         if ($this->maskSensitiveData) {
             MaskLogHelper::maskSensitiveVar($requestString, $this->maskSensitiveMemberPII);
