@@ -41,3 +41,27 @@ You can do this by running the following command:
 ```bash
 composer require symfony/monolog-bundle
 ```
+
+### Logging a body the masking can't read into
+
+The request and the response are logged as sent and received, then masked (`logs/mask_sensitive_data`). A body that is
+a JWT or an encrypted payload hides what it carries from the masking. Log what it carries instead:
+
+```php
+// The request: what the log shows instead of the query and body sent
+$request->setJson(['payload' => $jwt])->setLogBody(['payload' => $claims]);
+```
+
+```php
+// The response: in a response modifier that runs before the log's (priority above 210)
+$parsedResponse->logBody = json_encode($decodedClaims);
+```
+
+A response modifier that needs to know more about the call than its web service and action (which account's key
+decodes the answer) reads it from the request's attributes, which are neither sent, logged nor part of the cache key:
+
+```php
+$request->setAttribute('hotelCode', $hotelCode);
+// in the modifier
+$hotelCode = $parsedResponse->mainAsyncResponse->WSRequest->getAttribute('hotelCode');
+```

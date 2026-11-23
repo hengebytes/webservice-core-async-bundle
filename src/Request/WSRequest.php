@@ -17,6 +17,11 @@ class WSRequest
 
     private array $cacheVaryingParams = [];
 
+    private ?string $logBody = null;
+
+    /** @var array<string, mixed> */
+    private array $attributes = [];
+
     public function __construct(
         public readonly string $webService,
         public readonly string $action,
@@ -191,8 +196,45 @@ class WSRequest
         return array_merge($requestParams, $varyingParams);
     }
 
+    /**
+     * What the log shows instead of the query and body sent: for a body the log's masking can't read into
+     * (a JWT, an encrypted payload), what it carries. Masked as any other request's
+     */
+    public function setLogBody(array|string|null $logBody): static
+    {
+        if (is_array($logBody)) {
+            $logBody = (string)json_encode(
+                $logBody,
+                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE
+            );
+        }
+        $this->logBody = $logBody;
+
+        return $this;
+    }
+
+    /**
+     * Context for the request's middleware (a response modifier reading which account a call was made for).
+     * Neither sent, logged nor part of the cache key
+     */
+    public function setAttribute(string $name, mixed $value): static
+    {
+        $this->attributes[$name] = $value;
+
+        return $this;
+    }
+
+    public function getAttribute(string $name, mixed $default = null): mixed
+    {
+        return $this->attributes[$name] ?? $default;
+    }
+
     public function getLogString(): string
     {
+        if ($this->logBody !== null) {
+            return $this->logBody;
+        }
+
         $requestStringParts = [];
         $requestOptions = $this->getOptions();
         foreach (['query', 'json', 'body'] as $field) {
