@@ -167,14 +167,24 @@ class WSRequest
 
     public function getCacheParams(): array
     {
-        $query = $this->options['query'] ?? [];
-        $body = $this->options['body'] ?? [];
-        $json = $this->options['json'] ?? [];
-        ksort($query);
-        ksort($body);
-        ksort($json);
+        $requestParams = array_map(
+            static function (mixed $params): mixed {
+                if (is_array($params)) {
+                    ksort($params);
 
-        $requestParams = [$query, $body, $json];
+                    return $params;
+                }
+                // A raw body (an XML or JSON string) is part of the key as it is; a stream or a generator can be
+                // neither serialized nor read twice, its type stands for it
+                if ($params instanceof \Closure || $params instanceof \Generator || is_resource($params)) {
+                    return get_debug_type($params);
+                }
+
+                return $params;
+            },
+            [$this->options['query'] ?? [], $this->options['body'] ?? [], $this->options['json'] ?? []]
+        );
+
         $varyingParams = $this->cacheVaryingParams;
         ksort($varyingParams);
 
