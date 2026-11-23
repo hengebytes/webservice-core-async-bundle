@@ -61,6 +61,10 @@ abstract class MaskLogHelper
             '#eriesCode>[^<]*</#',
             '#eriesCode&gt;(.*?)&lt;/#',
             '#"cvv":\s?"[^"]*"#',
+            // A card number in full (gateways such as 2C2P send it masked, as 411111XXXXXX1111, left as it is)
+            '#ardNo":\s?"(\d{6,})(\d{4})"#',
+            // Credentials named in camel case, which 'token":' (lower-case) misses
+            '#(card|customer|access|refresh)Token":\s?"[^"]*"#',
         ];
         if ($maskMemberPII) {
             $patterns = array_merge($patterns, [
@@ -93,6 +97,8 @@ abstract class MaskLogHelper
             'eriesCode>*</',
             'eriesCode&gt;*&lt;/',
             '"cvv":"*"',
+            'ardNo":"*${2}"',
+            '${1}Token":"*"',
         ];
         if ($maskMemberPII) {
             $replacements = array_merge($replacements, [
