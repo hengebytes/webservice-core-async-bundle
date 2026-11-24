@@ -45,7 +45,8 @@ abstract class BaseCollection extends ArrayCollection implements JsonSerializabl
 
     /**
      * Note: this solution requires public access to property or a public getter method.
-     * @param string[] $orderings ['attribute' => Criteria::ASC / Criteria::DESC, ... ]
+     * @param array<string, \Doctrine\Common\Collections\Order|string> $orderings ['attribute' => Order::Ascending /
+     *        Order::Descending, ... ]; doctrine/collections 2 also takes 'ASC' / 'DESC'
      * @param int $limit
      * @param int $offset
      * @return static
@@ -53,7 +54,9 @@ abstract class BaseCollection extends ArrayCollection implements JsonSerializabl
      */
     public function getSorted(array $orderings, ?int $limit = null, ?int $offset = null)
     {
-        $criteria = Criteria::create(true);
+        // As Doctrine ORM does (OneToManyPersister): doctrine/collections 2, which has Criteria::ASC, reads fields
+        // through getters unless asked otherwise; 3 always reads them directly and deprecates the argument
+        $criteria = defined(Criteria::class . '::ASC') ? Criteria::create(true) : Criteria::create();
         if ($orderings) {
             $criteria->orderBy($orderings);
         }
