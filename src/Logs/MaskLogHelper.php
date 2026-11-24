@@ -65,6 +65,8 @@ abstract class MaskLogHelper
             '#ardNo":\s?"(\d{6,})(\d{4})"#',
             // Credentials named in camel case, which 'token":' (lower-case) misses
             '#(card|customer|access|refresh)Token":\s?"[^"]*"#',
+            // Base64 JSON token (JWT, JWE, signature.payload), masked whole; only from a run's start, to stay linear
+            '#(?<![\w+/\\\\-])(?:(?:[\w+/-]|\\\\/)++=*+\.)?eyJ(?:[\w+/=.-]|\\\\/){16,}+#',
         ];
         if ($maskMemberPII) {
             $patterns = array_merge($patterns, [
@@ -72,8 +74,10 @@ abstract class MaskLogHelper
                 '#irthDate="[^"]*"#',
                 '#"[^@"]+@[^@"]+"#',
                 '#>[^@<]+@[^@<]+<#',
-                '#<(Birthdate|AddressLine|postalCode|PostalCode|CityName|cityName|CITY|ZIP_CODE|NameEmail|BIRTH_DATE|ADDRESS[1-9]?)([^>]*)>[^<]*</\1>#',
-                '#&lt;(Birthdate|AddressLine|postalCode|PostalCode|CityName|cityName|CITY|ZIP_CODE|NameEmail|BIRTH_DATE|ADDRESS[1-9]?)([^&]*)&gt;.*?&lt;/\1&gt;#',
+                // Attributes stop at the next tag, so an unclosed one doesn't scan to the end
+                '#<(Birthdate|AddressLine|postalCode|PostalCode|CityName|cityName|CITY|ZIP_CODE|NameEmail|BIRTH_DATE|ADDRESS[1-9]?)([^<>]*+)>[^<]*+</\1>#',
+                // Escaped: attributes may hold &quot;; the value runs to the same tag's next open or close
+                '#&lt;(Birthdate|AddressLine|postalCode|PostalCode|CityName|cityName|CITY|ZIP_CODE|NameEmail|BIRTH_DATE|ADDRESS[1-9]?)((?:[^&]++|&(?!gt;|lt;))*+)&gt;(?:[^&]++|&(?!lt;/?\1(?=[\s/&])))*+&lt;/\1&gt;#',
                 '#(city|zipCode|zip|birthday|birthdate|address[1-9]?)":\s?"[^"]*"#',
             ]);
         }
@@ -99,6 +103,7 @@ abstract class MaskLogHelper
             '"cvv":"*"',
             'ardNo":"*${2}"',
             '${1}Token":"*"',
+            '*',
         ];
         if ($maskMemberPII) {
             $replacements = array_merge($replacements, [
@@ -112,7 +117,7 @@ abstract class MaskLogHelper
         }
 
         if (is_string($val)) {
-            $val = preg_replace($patterns, $replacements, $val);
+            $val = self::replace($patterns, $replacements, $val);
 
             return;
         }
@@ -142,11 +147,17 @@ abstract class MaskLogHelper
                 ) {
                     $val[$innerK] = '*';
                 } elseif (is_string($innerVal)) {
-                    $val[$innerK] = preg_replace($patterns, $replacements, $innerVal);
+                    $val[$innerK] = self::replace($patterns, $replacements, $innerVal);
                 } elseif (is_array($innerVal)) {
                     self::maskSensitiveVar($val[$innerK], $maskMemberPII);
                 }
             }
         }
+    }
+
+    /** A pattern that fails (PCRE backtrack limit) hides the whole value instead of nulling it */
+    private static function replace(array $patterns, array $replacements, string $value): string
+    {
+        return preg_replace($patterns, $replacements, $value) ?? '* (masking failed: ' . preg_last_error_msg() . ')';
     }
 }

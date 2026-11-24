@@ -14,6 +14,8 @@ This bundle provides a simple way to create asynchronous web services in Symfony
   - [Usage](docs/validation/index.md)
   - [Validation](docs/validation/index.md)
   - [Model](docs/model/index.md)
+- [Middleware](docs/middleware/index.md)
+  - [Responses that are not JSON](docs/middleware/bodyParser.md)
 - [Logs](docs/logs/index.md)
 - [Cache](docs/cache/index.md)
 - [Settings](docs/settings/index.md)

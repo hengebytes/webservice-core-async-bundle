@@ -21,3 +21,6 @@ Higher priority will be executed first
 | `StoreToCacheResponseModifier`         | -200  | `!$response->isCached`                                                | With Cache        |
 | `RequestUnlockResponseModifier`        | -210  | `!$response->isCached && $response->WSRequest->isCachable()`          | With Cache        |
 | `InvalidateCacheResponseModifier`      | -220  | `!$response->isCached && !$response->WSRequest->isGETRequestMethod()` | With Cache        |
+
+`ResponseParserResponseModifier` decodes the answer as JSON, unless a `ResponseBodyParserInterface` supports the
+request: see [Responses that are not JSON](bodyParser.md).

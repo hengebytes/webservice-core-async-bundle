@@ -42,20 +42,21 @@ You can do this by running the following command:
 composer require symfony/monolog-bundle
 ```
 
-### Logging a body the masking can't read into
+### Masking
 
-The request and the response are logged as sent and received, then masked (`logs/mask_sensitive_data`). A body that is
-a JWT or an encrypted payload hides what it carries from the masking. Log what it carries instead:
+With `logs/mask_sensitive_data` on, the request and the response are masked before they are logged: credentials,
+card data and, with `logs/mask_sensitive_member_pii`, the member's personal data. A token carrying base64 JSON (a JWT,
+a JWE, a signed request) is masked whole, as its payload can't be masked field by field.
+
+To keep what such a token carries readable, log it as request log params. They are appended to the logged request
+and masked like it, but neither sent nor part of the cache key:
 
 ```php
-// The request: what the log shows instead of the query and body sent
-$request->setJson(['payload' => $jwt])->setLogBody(['payload' => $claims]);
+$request->setJson(['payload' => $jwt])->setLogParams($claims);
+// logged: {"payload":"*"} followed by the claims, masked field by field
 ```
 
-```php
-// The response: in a response modifier that runs before the log's (priority above 210)
-$parsedResponse->logBody = json_encode($decodedClaims);
-```
+### Request attributes
 
 A response modifier that needs to know more about the call than its web service and action (which account's key
 decodes the answer) reads it from the request's attributes, which are neither sent, logged nor part of the cache key:

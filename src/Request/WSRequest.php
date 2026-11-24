@@ -17,10 +17,11 @@ class WSRequest
 
     private array $cacheVaryingParams = [];
 
-    private ?string $logBody = null;
-
     /** @var array<string, mixed> */
     private array $attributes = [];
+
+    /** @var array<string, mixed> */
+    private array $logParams = [];
 
     public function __construct(
         public readonly string $webService,
@@ -197,23 +198,6 @@ class WSRequest
     }
 
     /**
-     * What the log shows instead of the query and body sent: for a body the log's masking can't read into
-     * (a JWT, an encrypted payload), what it carries. Masked as any other request's
-     */
-    public function setLogBody(array|string|null $logBody): static
-    {
-        if (is_array($logBody)) {
-            $logBody = (string)json_encode(
-                $logBody,
-                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE
-            );
-        }
-        $this->logBody = $logBody;
-
-        return $this;
-    }
-
-    /**
      * Context for the request's middleware (a response modifier reading which account a call was made for).
      * Neither sent, logged nor part of the cache key
      */
@@ -229,17 +213,26 @@ class WSRequest
         return $this->attributes[$name] ?? $default;
     }
 
+    /** Logged after the body and masked like it; neither sent nor part of the cache key */
+    public function setLogParams(array $logParams): static
+    {
+        $this->logParams = $logParams;
+
+        return $this;
+    }
+
     public function getLogString(): string
     {
-        if ($this->logBody !== null) {
-            return $this->logBody;
-        }
-
         $requestStringParts = [];
         $requestOptions = $this->getOptions();
-        foreach (['query', 'json', 'body'] as $field) {
-            if (!empty($requestOptions[$field])) {
-                $value = $requestOptions[$field];
+        $values = [
+            $requestOptions['query'] ?? null,
+            $requestOptions['json'] ?? null,
+            $requestOptions['body'] ?? null,
+            $this->logParams,
+        ];
+        foreach ($values as $value) {
+            if (!empty($value)) {
                 try {
                     $requestStringParts[] = is_string($value)
                         ? $value
