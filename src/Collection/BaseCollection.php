@@ -2,7 +2,6 @@
 
 namespace Hengebytes\WebserviceCoreAsyncBundle\Collection;
 
-use Composer\InstalledVersions;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
@@ -55,7 +54,9 @@ abstract class BaseCollection extends ArrayCollection implements JsonSerializabl
      */
     public function getSorted(array $orderings, ?int $limit = null, ?int $offset = null)
     {
-        $criteria = self::createCriteria();
+        // As Doctrine ORM does (OneToManyPersister): doctrine/collections 2, which has Criteria::ASC, reads fields
+        // through getters unless asked otherwise; 3 always reads them directly and deprecates the argument
+        $criteria = defined(Criteria::class . '::ASC') ? Criteria::create(true) : Criteria::create();
         if ($orderings) {
             $criteria->orderBy($orderings);
         }
@@ -67,23 +68,6 @@ abstract class BaseCollection extends ArrayCollection implements JsonSerializabl
         }
 
         return $this->matching($criteria);
-    }
-
-    /**
-     * Criteria that read the fields themselves, not through getters. doctrine/collections 3 always does and has
-     * made the argument asking for it a deprecated no-op; doctrine/collections 2 must be asked: its default calls
-     * the getters (and is itself deprecated)
-     */
-    private static function createCriteria(): Criteria
-    {
-        static $readsFieldsByDefault;
-        $readsFieldsByDefault ??= version_compare(
-            (string)InstalledVersions::getVersion('doctrine/collections'),
-            '3.0.0',
-            '>='
-        );
-
-        return $readsFieldsByDefault ? Criteria::create() : Criteria::create(true);
     }
 
     /**
