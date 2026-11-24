@@ -11,11 +11,6 @@ class ParsedResponse
     public array $response = [];
     public array $headers = [];
     public string $responseBody = '';
-    /**
-     * What the log shows instead of the body received, set by a response modifier before the log's (priority 210):
-     * for a body the log's masking can't read into (a JWT, an encrypted payload), what it carries
-     */
-    public ?string $logBody = null;
     public int $statusCode = 0;
 
     public function __construct(public readonly AsyncResponse $mainAsyncResponse)
@@ -37,6 +32,6 @@ class ParsedResponse
             }
         }
 
-        return $responseInfo . "\n\n" . ($this->logBody ?? $this->responseBody);
+        return $responseInfo . "\n\n" . $this->responseBody;
     }
 }
